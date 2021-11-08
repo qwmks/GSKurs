@@ -11,13 +11,6 @@ height = 480
 pygame.init()
 screen = pygame.display.set_mode((width,height))
 font = pygame.font.Font(None,50)
-
-# GO_surface = pygame.surface.Surface((width,height))
-# GO_surface.fill('Green')
-
-# GO_text = font.render("Press any key to play again",True,'White')
-# GO_text_rect = GO_text.get_rect(topright = (width,0))
-
 rock_image = pygame.image.load('rock.png').convert_alpha()
 rock_sprite_sheet = spritesheet.SpriteSheet(rock_image)
 
@@ -33,6 +26,7 @@ rock_x = 400
 rock_y = 250
 
 base_background = pygame.image.load('grass.jpg').convert_alpha()
+
 score_surface = font.render("This is the score",True,'Red')
 score_rect = score_surface.get_rect(topleft = (0,0))
 
@@ -45,6 +39,7 @@ pc_sprite_sheet = spritesheet.SpriteSheet(pc_surface)
 isActive =1
 
 frame_counter = 0
+
 BG = (50, 50, 50)
 BLACK = (0, 0, 0)
 rock_anim = []
@@ -68,8 +63,7 @@ while True:
                 if event.key ==pygame.K_LEFT:
                     pc_rect.x-=20
                 if event.key ==pygame.K_SPACE:
-                    isActive=0
-                
+                    isActive=0                
         else:
             if event.type == pygame.KEYDOWN:
                 if event.key ==pygame.K_SPACE:
@@ -86,9 +80,7 @@ while True:
         frame_counter+=1
         if frame_counter>72:
             frame_counter= 0
-            
         if pc_rect.colliderect(rock_rect):
-            # pc_rect.x =0
             rock_rect.y =0
             health-=1
             if health<0:
