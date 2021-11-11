@@ -84,12 +84,11 @@ pause_rect = pause_surface.get_rect(center=(width/2,height/2 ))
 pc_surface = pygame.image.load('running.png').convert_alpha()
 pc_sprite_sheet = spritesheet.SpriteSheet(pc_surface)
 pc_anim = []
-pc_x = 400
 for i in range(9):
     # pc_anim.append(pc_sprite_sheet.get_image(i, 64, 64, 3, (0, 0, 0))) 
     pc_anim.append(pc_sprite_sheet.get_player(i, 36, 50, 3, (0, 0, 0))) 
-pc_rect = pc_anim[0].get_rect(bottomleft = (pc_x,height))
-
+pc_rect = pc_anim[0].get_rect(bottomleft = (400,height))
+pc_x_mov = 0
 
 rock_image = pygame.image.load('rock.png').convert_alpha()
 rock_sprite_sheet = spritesheet.SpriteSheet(rock_image)
@@ -121,12 +120,16 @@ while True:
             sys.exit()
         if isActive:
             if event.type == pygame.KEYDOWN:
+                
                 if event.key ==pygame.K_SPACE:
-                    isActive=0  
-                if event.key ==pygame.K_RIGHT:
-                    pc_rect.x+=20
-                elif event.key ==pygame.K_LEFT:
-                    pc_rect.x-=20
+                    isActive=0                
+                if event.key ==pygame.K_RIGHT or event.key ==pygame.K_d:
+                    pc_x_mov = 20
+                if event.key ==pygame.K_LEFT or event.key ==pygame.K_a:
+                    pc_x_mov = -20
+            if event.type==pygame.KEYUP:
+                if event.key ==pygame.K_RIGHT or event.key ==pygame.K_LEFT or event.key ==pygame.K_a  or event.key ==pygame.K_d:
+                    pc_x_mov = 0
             if event.type == spawn_timer:
                 match randint(0,2):
                     case 0:
@@ -145,7 +148,11 @@ while True:
                     pygame.mixer.music.unpause()
     if isActive:
         screen.blit(base_background,(0,0))
-        
+        pc_rect.x+=pc_x_mov
+        if pc_rect.x<0:
+            pc_rect.x=0
+        if pc_rect.x>width-pc_rect.w:
+            pc_rect.x  = width-pc_rect.w
         screen.blit(pc_anim[frame_counter%9],pc_rect)
         pygame.draw.rect(screen,(255,0,0),pc_rect,2)
         hearts,rocks = move_objects(hearts,rocks,frame_counter)
