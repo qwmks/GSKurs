@@ -22,6 +22,12 @@ class SpriteSheet():
 		image = pygame.transform.scale(image, (width * scale, height * scale))
 		image.set_colorkey(colour)
 		return image
+	def get_icon(self,width,height,scale,colour):
+		image = pygame.Surface((width, height)).convert_alpha()
+		image.blit(self.sheet, (0, 0), (0, 64*2, width, height))
+		image = pygame.transform.scale(image, (width * scale, height * scale))
+		image.set_colorkey(colour)
+		return image
 	# def get_image(self, frame, width, height, scale, colour, border):
 	# 	image = pygame.Surface((width, height)).convert_alpha()
 	# 	# image.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))
