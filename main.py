@@ -3,7 +3,7 @@ import sys
 from random import randint
 from pygame.constants import KEYDOWN
 import spritesheet
-
+import os
 from pygame.time import Clock
 def drawGO(score):
     screen.fill((152,255,152))
@@ -54,7 +54,7 @@ def move_objects(hearts,rocks,coins,frame_counter):
          return [],[],[]
 
 def collide_hearts(hearts,player,health,score):
-    heart_sound = pygame.mixer.Sound('heart.wav')
+    heart_sound = pygame.mixer.Sound(os.path.join(app_path,'heart.wav'))
     heart_sound.set_volume(3)
     if hearts:
         for heart in hearts:
@@ -69,7 +69,7 @@ def collide_hearts(hearts,player,health,score):
     return health,hearts,score
 
 def collide_rocks(rocks,player,health):
-    crush_sound = pygame.mixer.Sound('rockhit.wav')
+    crush_sound = pygame.mixer.Sound(os.path.join(app_path,'rockhit.wav'))
     crush_sound.set_volume(0.5)
     if rocks:
         for rock in rocks:
@@ -84,7 +84,7 @@ def collide_rocks(rocks,player,health):
     return health,rocks
 
 def collide_coins(coins,player,score):
-    coin_sound = pygame.mixer.Sound('coin.wav')
+    coin_sound = pygame.mixer.Sound(os.path.join(app_path,'coin.wav'))
     coin_sound.set_volume(0.5)
     if coins:
         for coin in coins:
@@ -104,18 +104,24 @@ def start_game(start_health,start_score):
     pygame.mixer.music.play(-1, 0.0)
     pygame.mixer.music.set_volume(0.5)
     return health,score,hearts,coins,rocks
-
+if getattr(sys, 'frozen', False):
+    # If the application is run as a bundle, the PyInstaller bootloader
+    # extends the sys module by a flag frozen=True and sets the app 
+    # path into variable _MEIPASS'.
+    app_path = sys._MEIPASS
+else:
+    app_path = os.path.dirname(os.path.abspath(__file__))
 width = 900
 height = 600
 start_health =0
 start_score =0
 pygame.init()
  
-pygame.mixer.music.load('bg_dream.mp3')
+pygame.mixer.music.load(os.path.join(app_path,'bg_dream.mp3'))
 
 pygame.display.set_caption("Super Runner")
 screen = pygame.display.set_mode((width,height))
-font = pygame.font.Font('pacifico.ttf',50)
+font = pygame.font.Font(os.path.join(app_path,'pacifico.ttf'),50)
 small_font = pygame.font.Font(None,30)
 base_background = pygame.image.load('grass.jpg').convert_alpha()
 base_background = pygame.transform.scale(base_background,(width,height))
