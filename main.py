@@ -5,6 +5,18 @@ from pygame.constants import KEYDOWN
 import spritesheet
 import os
 from pygame.time import Clock
+
+def start_game(start_health,start_score):
+    health =start_health
+    score = start_score
+    hearts =[]
+    coins = []
+    rocks = []
+    pygame.mixer.music.play(-1, 0.0)
+    pygame.mixer.music.set_volume(0.5)
+    pygame.time.set_timer(spawn_timer,1500)
+    return health,score,hearts,coins,rocks
+
 def drawGO(score):
     screen.fill((152,255,152))
     if score and score!=0:
@@ -30,9 +42,8 @@ def show_health(health):
     health_rect = health_surface.get_rect(topright = (width,0))
     screen.blit(health_surface,health_rect)
 
-def move_objects(hearts,rocks,coins,frame_counter):
+def move_objects(hearts,rocks,coins,frame_counter,speed):
     color = (255,0,0)
-    speed = 6
     if hearts or rocks or coins:
         for coin in coins:
             coin.y+=speed
@@ -96,15 +107,8 @@ def collide_coins(coins,player,score):
         coins = [coin for coin in coins if coin.x!=width+1]
     return score,coins
 
-def start_game(start_health,start_score):
-    health =start_health
-    score = start_score
-    hearts =[]
-    coins = []
-    rocks = []
-    pygame.mixer.music.play(-1, 0.0)
-    pygame.mixer.music.set_volume(0.5)
-    return health,score,hearts,coins,rocks
+
+
 if getattr(sys, 'frozen', False):
     # If the application is run as a bundle, the PyInstaller bootloader
     # extends the sys module by a flag frozen=True and sets the app 
@@ -112,11 +116,16 @@ if getattr(sys, 'frozen', False):
     app_path = sys._MEIPASS
 else:
     app_path = os.path.dirname(os.path.abspath(__file__))
+#Game Settings
 width = 900
 height = 600
 start_health =0
 start_score =0
+start_speed = 5
+pc_speed = 20
+shift_value = 5
 tickrate = 30
+accel = 1
 pygame.init()
  
 pygame.mixer.music.load(os.path.join(app_path,'bg_dream.mp3'))
@@ -130,8 +139,11 @@ base_background = pygame.transform.scale(base_background,(width,height))
 base_background_rect = base_background.get_rect(topleft = (0,0))
 health = start_health
 score = start_score
+speed=start_speed
 curr_time = 0
 start_time = 0
+pause_time = 0
+
 timer = pygame.time.Clock()
 
 pause_surface = font.render("The game is paused",True,'Blue')
@@ -172,6 +184,7 @@ showGO= 1
 isActive =0
 frame_counter = 0
 rng_handle = 0
+curr_tick = 0
 spawn_timer = pygame.USEREVENT+1
 pygame.time.set_timer(spawn_timer,1500)
 
@@ -185,27 +198,31 @@ while True:
                 health,score,hearts,coins,rocks = start_game(start_health,start_score)
                 pc_rect.x = width/2-pc_rect.w/2
                 pc_x_mov=0
+                pause_time = 0
                 showGO=0
                 isActive=1
-                
+                start_time=pygame.time.get_ticks()                
         else:
             if isActive:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LSHIFT:
-                        pc_x_mov/=5
+                        pc_x_mov/=shift_value
                     if event.key ==pygame.K_SPACE:
-                        isActive=0                
+                        isActive=0
+                        pause_time = pygame.time.get_ticks()                 
                     if event.key ==pygame.K_RIGHT or event.key ==pygame.K_d:
-                        pc_x_mov = 20
+                        pc_x_mov = pc_speed
                         if event.mod & pygame.KMOD_SHIFT:
-                            pc_x_mov = 4
+                            # pc_x_mov = 4
+                            pc_x_mov/=shift_value
                     if event.key ==pygame.K_LEFT or event.key ==pygame.K_a:
-                        pc_x_mov = -20
+                        pc_x_mov = -pc_speed
                         if event.mod & pygame.KMOD_SHIFT:
-                            pc_x_mov = -4
+                            # pc_x_mov = -4
+                            pc_x_mov/=shift_value
                 if event.type==pygame.KEYUP:
                     if event.key == pygame.K_LSHIFT:
-                        pc_x_mov*=5
+                        pc_x_mov*=shift_value
                     if event.key ==pygame.K_RIGHT or event.key ==pygame.K_LEFT or event.key ==pygame.K_a  or event.key ==pygame.K_d:
                         pc_x_mov = 0
                 if event.type == spawn_timer:
@@ -229,12 +246,25 @@ while True:
                 if event.type == pygame.KEYDOWN:
                     if event.key ==pygame.K_SPACE:
                         isActive=1
+                        pause_time=pygame.time.get_ticks()-pause_time
                         pygame.mixer.music.unpause()
     if showGO:
         drawGO(score)        
     else:
         if isActive:
+            curr_time=int((pygame.time.get_ticks()-start_time - pause_time)/1000)
             screen.blit(base_background,(0,0))
+            if speed==10 and curr_tick==1:
+                print('new timer')
+                pygame.time.set_timer(spawn_timer,1000)
+            if speed==15 and curr_tick==1:
+                print('new timer')
+                pygame.time.set_timer(spawn_timer,800)
+            if speed==25 and curr_tick==1:
+                print('new timer')
+                pygame.time.set_timer(spawn_timer,600)
+            if speed<30:
+                speed=start_speed+curr_time/10*accel
             pc_rect.x+=pc_x_mov
             if pc_rect.x<0:
                 pc_rect.x=0
@@ -242,7 +272,7 @@ while True:
                 pc_rect.x  = width-pc_rect.w
             screen.blit(pc_anim[frame_counter%9],pc_rect)
             pygame.draw.rect(screen,(255,0,0),pc_rect,2)
-            hearts,rocks,coins = move_objects(hearts,rocks,coins,frame_counter)
+            hearts,rocks,coins = move_objects(hearts,rocks,coins,frame_counter,speed)
             health,hearts,score = collide_hearts(hearts,pc_rect,health,score)
             health, rocks = collide_rocks(rocks,pc_rect,health)
             score,coins = collide_coins(coins,pc_rect,score)
@@ -254,8 +284,17 @@ while True:
                 frame_counter= 0
             show_score(score)
             show_health(health)
+            speed_surface = small_font.render(f"speed: {speed}",True,'Red')
+            speed_rect = speed_surface.get_rect(midtop = (width/2,20))
+            screen.blit(speed_surface,speed_rect)
+            time_surface = small_font.render(f" {curr_time}",True,'Red')
+            time_rect = time_surface.get_rect(midtop = (width/2,40))
+            screen.blit(time_surface,time_rect)
         else:
             pygame.mixer.music.pause()
             screen.blit(pause_surface,pause_rect)
     pygame.display.update()
+    curr_tick+=1
+    if curr_tick>=tickrate:
+        curr_tick= 0
     timer.tick(tickrate)
