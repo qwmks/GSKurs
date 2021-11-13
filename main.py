@@ -32,7 +32,7 @@ def show_health(health):
 
 def move_objects(hearts,rocks,coins,frame_counter):
     color = (255,0,0)
-    speed = 5
+    speed = 6
     if hearts or rocks or coins:
         for coin in coins:
             coin.y+=speed
@@ -54,13 +54,14 @@ def move_objects(hearts,rocks,coins,frame_counter):
          return [],[],[]
 
 def collide_hearts(hearts,player,health,score):
+    max_health=3
     heart_sound = pygame.mixer.Sound(os.path.join(app_path,'heart.wav'))
     heart_sound.set_volume(3)
     if hearts:
         for heart in hearts:
             if player.colliderect(heart):
                 heart_sound.play()
-                if health==5:
+                if health==max_health:
                     score+=50
                 else:
                     health+=1
@@ -115,6 +116,7 @@ width = 900
 height = 600
 start_health =0
 start_score =0
+tickrate = 30
 pygame.init()
  
 pygame.mixer.music.load(os.path.join(app_path,'bg_dream.mp3'))
@@ -123,19 +125,20 @@ pygame.display.set_caption("Super Runner")
 screen = pygame.display.set_mode((width,height))
 font = pygame.font.Font(os.path.join(app_path,'pacifico.ttf'),50)
 small_font = pygame.font.Font(None,30)
-base_background = pygame.image.load('grass.jpg').convert_alpha()
+base_background = pygame.image.load(os.path.join(app_path,'grass.jpg')).convert_alpha()
 base_background = pygame.transform.scale(base_background,(width,height))
 base_background_rect = base_background.get_rect(topleft = (0,0))
 health = start_health
 score = start_score
-
+curr_time = 0
+start_time = 0
 timer = pygame.time.Clock()
 
 pause_surface = font.render("The game is paused",True,'Blue')
 pause_rect = pause_surface.get_rect(center=(width/2,height/2 ))
 
 # objects 
-pc_surface = pygame.image.load('running.png').convert_alpha()
+pc_surface = pygame.image.load(os.path.join(app_path,'running.png')).convert_alpha()
 pc_sprite_sheet = spritesheet.SpriteSheet(pc_surface)
 pc_anim = []
 for i in range(9):
@@ -144,21 +147,21 @@ pc_rect = pc_anim[0].get_rect(midbottom =(width/2,height))
 pc_x_mov = 0
 pc_icon = pc_sprite_sheet.get_icon(64,64,4,(0,0,0))
 
-rock_image = pygame.image.load('rock.png').convert_alpha()
+rock_image = pygame.image.load(os.path.join(app_path,'rock.png')).convert_alpha()
 rock_sprite_sheet = spritesheet.SpriteSheet(rock_image)
 rock_anim = []
 for i in range(4):
     rock_anim.append(rock_sprite_sheet.get_image(i, 32, 32, 3, (0, 0, 0))) 
 rocks = []
 
-coin_image = pygame.image.load('coins.png').convert_alpha()
+coin_image = pygame.image.load(os.path.join(app_path,'coins.png')).convert_alpha()
 coin_sprite_sheet = spritesheet.SpriteSheet(coin_image)
 coin_anim = []
 for i in range(8):
     coin_anim.append(coin_sprite_sheet.get_image(i, 16, 16, 3, (0, 0, 0))) 
 coins = []
 
-heart_image = pygame.image.load('heart.png').convert_alpha()
+heart_image = pygame.image.load(os.path.join(app_path,'heart.png')).convert_alpha()
 heart_sprite_sheet = spritesheet.SpriteSheet(heart_image)
 heart_anim = []
 for i in range(6):
@@ -207,20 +210,17 @@ while True:
                         pc_x_mov = 0
                 if event.type == spawn_timer:
                     if rng_handle<2:
-                        match randint(0,5):
+                        match randint(0,7):
                             case 0:
                                 hearts.append(heart_anim[0].get_rect(bottomleft=(randint(0,width-heart_anim[0].get_width()),0)))
                                 rng_handle+=1
                             case 1:
-                                rocks.append(rock_anim[0].get_rect(bottomleft=(randint(0,width-rock_anim[0].get_width()),0)))
-                            case 2:
-                                rocks.append(rock_anim[0].get_rect(bottomleft=(randint(0,width-rock_anim[0].get_width()),0)))
-                            case 3:
                                 coins.append(coin_anim[0].get_rect(bottomleft=(randint(0,width-coin_anim[0].get_width()),0)))
                                 rng_handle+=1
-                            case 4:
-                                rocks.append(rock_anim[0].get_rect(bottomleft=(randint(0,width-rock_anim[0].get_width()),0)))
-                            case 5:
+                            case 2:
+                                coins.append(coin_anim[0].get_rect(bottomleft=(randint(0,width-coin_anim[0].get_width()),0)))
+                                rng_handle+=1
+                            case _:
                                 rocks.append(rock_anim[0].get_rect(bottomleft=(randint(0,width-rock_anim[0].get_width()),0)))
                     else:
                         rocks.append(rock_anim[0].get_rect(bottomleft=(randint(0,width-rock_anim[0].get_width()),0)))
@@ -258,4 +258,4 @@ while True:
             pygame.mixer.music.pause()
             screen.blit(pause_surface,pause_rect)
     pygame.display.update()
-    timer.tick(30)
+    timer.tick(tickrate)
