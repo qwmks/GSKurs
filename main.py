@@ -66,7 +66,7 @@ def move_objects(hearts,rocks,coins,frame_counter,speed):
 
 def collide_hearts(hearts,player,health,score):
     max_health=3
-    heart_sound = pygame.mixer.Sound(os.path.join(app_path,'heart.wav'))
+    heart_sound = pygame.mixer.Sound(os.path.join(app_path,'sounds/heart.wav'))
     heart_sound.set_volume(3)
     if hearts:
         for heart in hearts:
@@ -81,7 +81,7 @@ def collide_hearts(hearts,player,health,score):
     return health,hearts,score
 
 def collide_rocks(rocks,player,health):
-    crush_sound = pygame.mixer.Sound(os.path.join(app_path,'rockhit.wav'))
+    crush_sound = pygame.mixer.Sound(os.path.join(app_path,'sounds/rockhit.wav'))
     crush_sound.set_volume(0.5)
     if rocks:
         for rock in rocks:
@@ -96,7 +96,7 @@ def collide_rocks(rocks,player,health):
     return health,rocks
 
 def collide_coins(coins,player,score):
-    coin_sound = pygame.mixer.Sound(os.path.join(app_path,'coin.wav'))
+    coin_sound = pygame.mixer.Sound(os.path.join(app_path,'sounds/coin.wav'))
     coin_sound.set_volume(0.5)
     if coins:
         for coin in coins:
@@ -128,13 +128,13 @@ tickrate = 30
 accel = 1
 pygame.init()
  
-pygame.mixer.music.load(os.path.join(app_path,'bg_dream.mp3'))
+pygame.mixer.music.load(os.path.join(app_path,'sounds/bg_dream.mp3'))
 
 pygame.display.set_caption("Super Runner")
 screen = pygame.display.set_mode((width,height))
-font = pygame.font.Font(os.path.join(app_path,'pacifico.ttf'),50)
+font = pygame.font.Font(os.path.join(app_path,'fonts/pacifico.ttf'),50)
 small_font = pygame.font.Font(None,30)
-base_background = pygame.image.load(os.path.join(app_path,'grass.jpg')).convert_alpha()
+base_background = pygame.image.load(os.path.join(app_path,'images/grass.jpg')).convert_alpha()
 base_background = pygame.transform.scale(base_background,(width,height))
 base_background_rect = base_background.get_rect(topleft = (0,0))
 health = start_health
@@ -150,7 +150,7 @@ pause_surface = font.render("The game is paused",True,'Blue')
 pause_rect = pause_surface.get_rect(center=(width/2,height/2 ))
 
 # objects 
-pc_surface = pygame.image.load(os.path.join(app_path,'running.png')).convert_alpha()
+pc_surface = pygame.image.load(os.path.join(app_path,'images/running.png')).convert_alpha()
 pc_sprite_sheet = spritesheet.SpriteSheet(pc_surface)
 pc_anim = []
 for i in range(9):
@@ -159,21 +159,21 @@ pc_rect = pc_anim[0].get_rect(midbottom =(width/2,height))
 pc_x_mov = 0
 pc_icon = pc_sprite_sheet.get_icon(64,64,4,(0,0,0))
 
-rock_image = pygame.image.load(os.path.join(app_path,'rock.png')).convert_alpha()
+rock_image = pygame.image.load(os.path.join(app_path,'images/rock.png')).convert_alpha()
 rock_sprite_sheet = spritesheet.SpriteSheet(rock_image)
 rock_anim = []
 for i in range(4):
     rock_anim.append(rock_sprite_sheet.get_image(i, 32, 32, 3, (0, 0, 0))) 
 rocks = []
 
-coin_image = pygame.image.load(os.path.join(app_path,'coins.png')).convert_alpha()
+coin_image = pygame.image.load(os.path.join(app_path,'images/coins.png')).convert_alpha()
 coin_sprite_sheet = spritesheet.SpriteSheet(coin_image)
 coin_anim = []
 for i in range(8):
     coin_anim.append(coin_sprite_sheet.get_image(i, 16, 16, 3, (0, 0, 0))) 
 coins = []
 
-heart_image = pygame.image.load(os.path.join(app_path,'heart.png')).convert_alpha()
+heart_image = pygame.image.load(os.path.join(app_path,'images/heart.png')).convert_alpha()
 heart_sprite_sheet = spritesheet.SpriteSheet(heart_image)
 heart_anim = []
 for i in range(6):

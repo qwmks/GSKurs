@@ -4,12 +4,13 @@
 block_cipher = None
 
 added_files = [
-        ( '*.png', '.' ),  
-        ( '*.wav', '.' ),  
-        ( '*.ttf', '.'),  
-        ('*.jpg','.'),
-        ( '*.mp3', '.'),
-        ('*.py','.')  
+
+        ('*.py','.'),
+        ( 'images/*.png', 'images/.' ),  
+        ( 'sounds/*.wav', 'sounds/.' ),  
+        ( 'fonts/*.ttf', 'fonts/.'),  
+        ('images/*.jpg','images/.'),
+        ( 'sounds/*.mp3', 'sounds/.'), 
          ]
 
 a = Analysis(
